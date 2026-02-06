@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Přihlášení{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-12 col-sm-10 col-md-5 col-lg-4">
+        <div class="card card-apple admin-login-card login-glow">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <p class="text-secondary text-uppercase mb-2" style="font-size: 0.75rem; letter-spacing: 0.12em; font-weight: 600;">Přístup do aplikace</p>
+                    <h2 class="fw-bold mb-2" style="font-size: 1.75rem; letter-spacing: -0.04em;">Přihlášení</h2>
+                    <p class="text-secondary small mb-0">Zadejte svůj PIN</p>
+                </div>
+
+                <form method="POST" id="loginForm">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" for="pin">PIN</label>
+                        <input type="password" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
+                               class="form-control form-control-lg text-center" name="pin" id="pin"
+                               placeholder="4–10 číslic" maxlength="10" minlength="4"
+                               aria-label="PIN" required>
+                        <small class="form-text text-muted">Rychlé přihlášení PINem</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 mt-2 fw-semibold">Přihlásit se</button>
+                </form>
+
+                <p class="text-secondary small text-center mt-3 mb-0">
+                    Po přihlášení budete přesměrováni na přehled nebo admin panel.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.login-glow { box-shadow: 0 25px 50px -12px rgba(99,102,241,0.15); }
+[data-theme="dark"] .login-glow { box-shadow: 0 25px 50px -12px rgba(99,102,241,0.2); }
+@media (max-width: 576px) {
+    .admin-login-card .card-body { padding: 1.25rem !important; }
+    .admin-login-card .btn-lg { padding: 0.75rem 1rem; font-size: 1rem; }
+}
+</style>
+
+{% endblock %}

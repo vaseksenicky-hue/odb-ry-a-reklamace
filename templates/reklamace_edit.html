@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Upravit reklamaci #{{ reklamace.id }}{% endblock %}
+
+{% block content %}
+<section class="mb-4">
+    <p class="text-secondary text-uppercase mb-1" style="font-size: 0.8125rem; letter-spacing: 0.12em; font-weight: 600;">Upravit reklamaci</p>
+    <h1 class="fw-bold mb-3" style="font-size: clamp(1.5rem, 4vw, 2rem); letter-spacing: -0.04em;">#{{ reklamace.id }} – {{ pobocka.nazev }}</h1>
+    {% if pobocka.adresa or pobocka.firma %}
+    <div class="reklamace-return-address card card-apple py-2 px-4 mb-0 d-inline-block">
+        <small class="text-secondary"><strong>Adresa kde se zboží vrací:</strong> {% if pobocka.firma %}{{ pobocka.firma }}{% endif %}{% if pobocka.firma and pobocka.adresa %} · {% endif %}{% if pobocka.adresa %}{{ pobocka.adresa }}{% endif %}{% if not pobocka.adresa and not pobocka.firma %}{{ pobocka.nazev }}{% endif %}</small>
+    </div>
+    {% endif %}
+</section>
+
+<div class="card card-apple mb-4">
+    <div class="card-body p-4">
+        <h5 class="card-title fw-semibold mb-4">
+            <i class="fas fa-edit me-2" style="color: var(--accent-solid);"></i>Reklamace #{{ reklamace.id }}
+        </h5>
+        {% if validacni_chyba %}
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>{{ validacni_chyba }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endif %}
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="row g-3">
+                <div class="col-12">
+                    <h6 class="text-secondary text-uppercase mb-2" style="font-size: 0.75rem; letter-spacing: 0.08em;">Zákazník</h6>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            {{ form.zakaznik.label(class="form-label") }} <span class="text-danger">*</span>
+                            {{ form.zakaznik(class="form-control", required=True) }}
+                            {% if form.zakaznik.errors %}<div class="text-danger small mt-1">{% for e in form.zakaznik.errors %}{{ e }}{% endfor %}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.telefon.label(class="form-label") }} <span class="text-danger">*</span>
+                            <div class="input-group">
+                                <span class="input-group-text">+420</span>
+                                <input type="text" name="telefon" class="form-control" maxlength="9" placeholder="123456789" pattern="[0-9]{9}" title="9 číslic" value="{{ request.form.get('telefon', telefon_plain) }}" required>
+                            </div>
+                            {% if form.telefon.errors %}<div class="text-danger small mt-1">{% for e in form.telefon.errors %}{{ e }}{% endfor %}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <h6 class="text-secondary text-uppercase mb-2" style="font-size: 0.75rem; letter-spacing: 0.08em;">Reklamované zboží</h6>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            {{ form.znacka.label(class="form-label") }} <span class="text-danger">*</span>
+                            {{ form.znacka(class="form-control", required=True) }}
+                            {% if form.znacka.errors %}<div class="text-danger small mt-1">{% for e in form.znacka.errors %}{{ e }}{% endfor %}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.model.label(class="form-label") }} <span class="text-danger">*</span>
+                            {{ form.model(class="form-control", required=True) }}
+                            {% if form.model.errors %}<div class="text-danger small mt-1">{% for e in form.model.errors %}{{ e }}{% endfor %}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.barva.label(class="form-label") }}
+                            {{ form.barva(class="form-control") }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <h6 class="text-secondary text-uppercase mb-2" style="font-size: 0.75rem; letter-spacing: 0.08em;">Datumy a stav</h6>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            {{ form.datum_prijmu.label(class="form-label") }}
+                            {{ form.datum_prijmu(class="form-control", type="date") }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Datum zakoupení <span class="text-secondary fw-normal">(pro PDF)</span></label>
+                            {{ form.datum_zakoupeni(class="form-control", type="date") }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.stav.label(class="form-label") }}
+                            {{ form.stav(class="form-select") }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4" id="slevaProcentWrap" style="display:{% if form.stav.data == 'Zamítnuto' %}block{% else %}none{% endif %};">
+                    {{ form.sleva_procent.label(class="form-label") }}
+                    {{ form.sleva_procent(class="form-control", type="number", min="0", max="100", step="0.5", placeholder="např. 15") }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.cena.label(class="form-label") }}
+                    {{ form.cena(class="form-control", type="number", step="0.01", min="0") }}
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <div class="form-check">
+                        {{ form.zavolano_zakaznikovi(class="form-check-input") }}
+                        {{ form.zavolano_zakaznikovi.label(class="form-check-label") }}
+                    </div>
+                </div>
+                <div class="col-12">
+                    {{ form.popis_zavady.label(class="form-label") }}
+                    {{ form.popis_zavady(class="form-control", rows="3") }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.reseni.label(class="form-label") }}
+                    {{ form.reseni(class="form-control", rows="2") }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.poznamky.label(class="form-label") }}
+                    {{ form.poznamky(class="form-control", rows="2") }}
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mt-4">
+                <button type="submit" class="btn btn-primary rounded-pill py-2 px-4 fw-semibold">
+                    <i class="fas fa-save me-2"></i>Uložit změny
+                </button>
+                <a class="btn btn-outline-secondary rounded-pill py-2" href="{{ url_for('reklamace_branch', pobocka_id=pobocka.id) }}">Zpět</a>
+                <a class="btn btn-outline-primary rounded-pill py-2" href="{{ url_for('reklamace_print', reklamace_id=reklamace.id) }}" target="_blank">
+                    <i class="fas fa-file-pdf me-2"></i>Vytvořit PDF
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var s = document.querySelector('select[name="stav"]');
+    var w = document.getElementById('slevaProcentWrap');
+    if (s && w) {
+        s.addEventListener('change', function() { w.style.display = (this.value === 'Zamítnuto') ? 'block' : 'none'; });
+    }
+});
+</script>
+{% endblock %}
