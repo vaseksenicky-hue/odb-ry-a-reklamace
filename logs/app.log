@@ -98,3 +98,5 @@
 2026-02-06 14:29:31,090 INFO: Pøidán sloupec archived do Reklamace [in C:\Users\Thu\Downloads\odberos\site\app.py:556]
 2026-02-06 14:29:31,090 INFO: Pøidán sloupec archived_at do Reklamace [in C:\Users\Thu\Downloads\odberos\site\app.py:570]
 2026-02-06 14:31:23,207 INFO: Aplikace spuštìna [in C:\Users\Thu\Downloads\odberos\site\app.py:72]
+2026-02-06 16:58:13,415 INFO: Aplikace spuštìna [in C:\Users\Thu\Downloads\odberos\site\app.py:75]
+2026-02-06 17:15:37,204 INFO: Uživatel a má nyní 1 poboèek: ['Teplice'] [in C:\Users\Thu\Downloads\odberos\site\app.py:2189]

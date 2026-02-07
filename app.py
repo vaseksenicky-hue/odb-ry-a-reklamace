@@ -38,8 +38,10 @@ if SECRET_KEY == 'your-secret-key' and os.environ.get('FLASK_ENV') != 'developme
     app.logger.warning("⚠️ KRITICKÉ: Používá se defaultní SECRET_KEY! Nastavte SECRET_KEY v produkci!")
 
 app.config['SECRET_KEY'] = SECRET_KEY
-_db_url = os.environ.get('DATABASE_URL', 'sqlite:///odbery.db')
-if _db_url.startswith('postgres://'):
+_db_url = (os.environ.get('DATABASE_URL') or '').strip()
+if not _db_url or len(_db_url) < 10:
+    _db_url = 'sqlite:///odbery.db'
+elif _db_url.startswith('postgres://'):
     _db_url = 'postgresql://' + _db_url[11:]  # Neon vrací postgres://, SQLAlchemy chce postgresql://
 app.config['SQLALCHEMY_DATABASE_URI'] = _db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

@@ -87,7 +87,8 @@ git init
 
 # Přidání všech souborů
 git add .
-
+git config --global user.email "vasek.senicky@gmail.com"
+git config --global user.name "vaseksenicky-hue"
 # První commit
 git commit -m "První verze - odběry a reklamace"
 
@@ -195,19 +196,54 @@ Vyplňte nebo zkontrolujte následující pole:
 - **Příčina:** Aplikace se ještě probouzí nebo build selhal
 - **Řešení:** Počkejte 1–2 minuty a obnovte stránku. Free tier usíná po 15 min nečinnosti – první request pak trvá déle.
 
+### "Root directory site does not exist"
+
+Tato chyba znamená, že Render hledá složku `site`, ale v repozitáři ji nenajde.
+
+**Možnost A – Aplikace je přímo v kořeni repozitáře** (app.py, requirements.txt v rootu):
+1. V Render Dashboard otevřete vaši službu
+2. Klikněte na **Settings**
+3. V poli **Root Directory** smažte hodnotu `site` a nechte prázdné
+4. Uložte a spusťte **Manual Deploy**
+
+**Možnost B – Máte složku site/ v repozitáři** (struktura: site/app.py, site/requirements.txt):
+1. Ověřte na GitHubu, že složka `site` skutečně existuje v kořeni repozitáře
+2. Pokud ne, nahrajte projekt znovu z adresáře nad `site`:
+   ```powershell
+   cd C:\Users\Thu\Downloads\odberos   # nad složkou site
+   git add .
+   git commit -m "Přidána složka site"
+   git push
+   ```
+
 ### Build failed (červená chyba)
 
 1. Klikněte na **Logs** v Render dashboardu
 2. Zkontrolujte chybovou hlášku
 3. Časté příčiny:
-   - **Špatný Root Directory** – musí být `site`
-   - **Chybějící requirements.txt** – ověřte, že soubor existuje v `site/`
+   - **Špatný Root Directory** – pokud je app v rootu, nechte prázdné; pokud je v `site/`, zadejte `site`
+   - **Chybějící requirements.txt** – ověřte, že soubor existuje v kořeni nebo v `site/`
    - **Chybějící DATABASE_URL** – doplňte connection string z Neon
 
 ### Přihlášení nefunguje
 
 - Ověřte, že používáte správné údaje: PIN `0000` nebo admin / admin123
 - Zkuste jiný prohlížeč nebo anonymní okno (vyřadíte problém s cookies)
+
+### "Could not parse SQLAlchemy URL from given URL string"
+
+Tato chyba znamená, že **`DATABASE_URL` není nastavená** nebo je prázdná/neplatná.
+
+**Řešení:**
+1. V Render Dashboard → vaše služba → **Environment**
+2. Přidejte proměnnou `DATABASE_URL` (nebo zkontrolujte, že existuje a má hodnotu)
+3. Jako hodnotu vložte **celý connection string z Neon**, např.:
+   ```
+   postgresql://neondb_owner:xxxxx@ep-xxx.eu-central-1.aws.neon.tech/neondb?sslmode=require
+   ```
+4. Uložte a spusťte **Manual Deploy**
+
+> Connection string získáte v Neon dashboardu → váš projekt → Connection string → Copy.
 
 ### Databáze nefunguje / chyby při ukládání
 
